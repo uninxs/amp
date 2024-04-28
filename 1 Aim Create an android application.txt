@@ -1,0 +1,902 @@
+1 Aim: Create an android application to pass the data from one application to another application using intent.
+
+Source Code:
+
+//activity_main.xml
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+xmlns:app="http://schemas.android.com/apk/res-auto"
+xmlns:tools="http://schemas.android.com/tools"
+android:layout_width="match_parent"
+android:layout_height="match_parent"
+android:orientation="vertical"
+android:gravity="center"
+android:padding="20dp"
+tools:context=".MainActivity">
+<EditText
+android:id="@+id/dataET"
+android:layout_width="match_parent"
+android:layout_height="wrap_content"
+android:layout_marginBottom="20dp"
+android:textSize="30sp"
+android:hint="Enter Your Data" />
+<Button
+android:id="@+id/button"
+android:layout_width="wrap_content"
+android:layout_height="wrap_content"
+android:textSize="30sp"
+android:text="Send Data"
+app:layout_constraintBottom_toBottomOf="parent"
+app:layout_constraintEnd_toEndOf="parent"
+app:layout_constraintStart_toStartOf="parent"
+app:layout_constraintTop_toTopOf="parent" />
+</LinearLayout>
+
+//MainActivity.kt
+class MainActivity : AppCompatActivity() {
+lateinit var nameET:EditText
+lateinit var proceedBtn:Button
+override fun onCreate(savedInstanceState: Bundle?) {
+super.onCreate(savedInstanceState)
+setContentView(R.layout.activity_main)
+nameET = findViewById(R.id.nameET)
+proceedBtn = findViewById(R.id.proceedBtn)
+proceedBtn.setOnClickListener {
+if(nameET.text.isEmpty()) {
+Toast.makeText(this, "Enter Your Name", Toast.LENGTH_SHORT).show()
+} else {
+val intent = Intent(this, MainActivity2::class.java)
+intent.putExtra("name", nameET.text.toString())
+startActivity(intent)
+}
+}
+}
+}
+
+2 Aim: Create an android application to display Alert Dialog.
+
+Source Code:
+
+//activity_main.xml
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+xmlns:android="http://schemas.android.com/apk/res/android"
+xmlns:tools="http://schemas.android.com/tools"
+android:layout_width="match_parent"
+android:layout_height="match_parent"
+android:orientation="vertical"
+android:gravity="center_vertical"
+android:padding="50dp"
+tools:context=".MainActivity">
+<Button
+android:id="@+id/showDialogBtn"
+android:layout_width="match_parent"
+android:layout_height="wrap_content"
+android:text="Show Dialog"
+android:textSize="30sp"/>
+</LinearLayout>
+
+//MainActivity.kt
+class MainActivity : AppCompatActivity() {
+lateinit var showDialogBtn:Button
+override fun onCreate(savedInstanceState: Bundle?) {
+super.onCreate(savedInstanceState)
+setContentView(R.layout.activity_main)
+showDialogBtn = findViewById(R.id.showDialogBtn)
+showDialogBtn.setOnClickListener {
+val alertdialog = AlertDialog.Builder(this)
+alertdialog.setTitle("Dummy Dialog")
+alertdialog.setMessage("Are you sure?")
+alertdialog.setPositiveButton("Yes") { dialogInterface, which ->
+Toast.makeText(this,"Clicked Yes",Toast.LENGTH_LONG).show()
+}
+alertdialog.setNegativeButton("No") { dialogInterface, which ->
+Toast.makeText(this,"Clicked No",Toast.LENGTH_LONG).show()
+}
+alertdialog.setNeutralButton("Cancel") { dialogInterface, which ->
+Toast.makeText(this,"Clicked Cancel",Toast.LENGTH_LONG).show()
+}
+alertdialog.create()
+alertdialog.show()
+}
+}
+}
+
+
+
+3 Aim: Create an android application to generate notifications.
+
+Source Code:
+AndroidManifest.xml
+<uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+activity_main.kt
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+xmlns:tools="http://schemas.android.com/tools"
+android:layout_width="match_parent"
+android:layout_height="match_parent"
+android:orientation="vertical"
+android:padding="20dp"
+android:gravity="center_vertical"
+tools:context=".MainActivity">
+<Button
+android:id="@+id/btnGetNonClickableNotification"
+android:layout_width="match_parent"
+android:text="Get Non-Clickable Notification"
+android:textSize="20sp"
+android:padding="15dp"
+android:layout_marginBottom="10dp"
+android:layout_height="wrap_content"/>
+<Button
+android:id="@+id/btnGetClickableNotification"
+android:layout_width="match_parent"
+android:text="Get Clickable Notification"
+android:textSize="20sp"
+android:padding="15dp"
+android:layout_height="wrap_content"/>
+</LinearLayout>
+MainActivity.kt
+class MainActivity : AppCompatActivity() {
+lateinit var getClickableNotificationButton:Button
+lateinit var getNonClickableNotificationButton:Button
+private val CHANNEL_ID = "my_channel"
+private val NOTIFICATION_ID_NON_CLICKABLE = 1
+private val NOTIFICATION_ID_CLICKABLE = 2
+override fun onCreate(savedInstanceState: Bundle?) {
+super.onCreate(savedInstanceState)
+setContentView(R.layout.activity_main)
+createNotificationChannel()
+getClickableNotificationButton =
+findViewById(R.id.btnGetClickableNotification)
+getNonClickableNotificationButton =
+findViewById(R.id.btnGetNonClickableNotification)
+getClickableNotificationButton.setOnClickListener {
+showClickableNotification()
+}
+getNonClickableNotificationButton.setOnClickListener {
+showNonClickableNotification()
+}
+}
+private fun createNotificationChannel() {
+val name = "Practical 3"
+val descriptionText = "Practical 3 Home Page"
+val importance = NotificationManager.IMPORTANCE_DEFAULT
+val channel = NotificationChannel(CHANNEL_ID, name, importance).apply {
+description = descriptionText
+}
+val notificationManager: NotificationManager =
+getSystemService(NOTIFICATION_SERVICE) as NotificationManager
+notificationManager.createNotificationChannel(channel)
+}
+private fun showClickableNotification() {
+val intent = Intent(this, MainActivity::class.java)
+val pendingIntent = PendingIntent.getActivity(this, 0, intent,
+PendingIntent.FLAG_IMMUTABLE)
+val builder = Notification.Builder(this, CHANNEL_ID)
+.setSmallIcon(R.drawable.ic_launcher_background)
+.setContentTitle("Clickable Notification")
+.setContentText("Click to reload the app")
+.setContentIntent(pendingIntent)
+.setAutoCancel(true)
+val notificationManager: NotificationManager =
+getSystemService(NOTIFICATION_SERVICE) as NotificationManager
+notificationManager.notify(NOTIFICATION_ID_CLICKABLE, builder.build())
+}
+private fun showNonClickableNotification() {
+val builder = Notification.Builder(this, CHANNEL_ID)
+.setSmallIcon(R.drawable.ic_launcher_background)
+.setContentTitle("Non-Clickable Notification")
+.setContentText("This notification cannot be clicked.")
+.setAutoCancel(true)
+val notificationManager: NotificationManager =
+getSystemService(NOTIFICATION_SERVICE) as NotificationManager
+notificationManager.notify(NOTIFICATION_ID_NON_CLICKABLE, builder.build())
+}
+}
+Output:
+4 Aim: Demonstrate the use of Media API in android to play an audio file.
+Source Code:
+activity_main.xml
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+xmlns:tools="http://schemas.android.com/tools"
+android:layout_width="match_parent"
+android:layout_height="match_parent"
+android:orientation="vertical"
+android:gravity="center"
+android:padding="20dp"
+tools:context=".MainActivity">
+<Button
+android:id="@+id/playBtn"
+android:layout_width="match_parent"
+android:layout_height="wrap_content"
+android:text="Play Media" />
+<Button
+android:id="@+id/pauseBtn"
+android:layout_width="match_parent"
+android:layout_height="wrap_content"
+android:text="Pause Media" />
+</LinearLayout>
+MainActivity.kt
+class MainActivity : AppCompatActivity() {
+var mediaPlayer = MediaPlayer()
+override fun onCreate(savedInstanceState: Bundle?) {
+super.onCreate(savedInstanceState)
+setContentView(R.layout.activity_main)
+val playBtn = findViewById<Button>(R.id.playBtn)
+val pauseBtn = findViewById<Button>(R.id.pauseBtn)
+playBtn.setOnClickListener {
+mediaPlayer.setDataSource(this, Uri.parse("android.resource://" +
+this.packageName + "/" + R.raw.payphone))
+mediaPlayer.prepare()
+mediaPlayer.start()
+}
+pauseBtn.setOnClickListener {
+mediaPlayer.stop()
+mediaPlayer.release()
+mediaPlayer = MediaPlayer()
+}
+}
+}
+Output:
+5 Aim: Create an android application which automatically notify the user when
+Airplane mode is turned on or off using broadcast receiver.
+SourceCode:
+AndroidManifest.xml
+<uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+activity_main.xml
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+xmlns:app="http://schemas.android.com/apk/res-auto"
+xmlns:tools="http://schemas.android.com/tools"
+android:id="@+id/main"
+android:layout_width="match_parent"
+android:layout_height="match_parent"
+android:gravity="center"
+android:padding="20dp"
+tools:context=".MainActivity">
+<TextView
+android:id="@+id/infoText"
+android:layout_width="match_parent"
+android:layout_height="wrap_content"
+android:textAlignment="center"
+android:textStyle="bold"
+android:textSize="30sp"
+android:text="Hello World!" />
+</LinearLayout>
+MainActivity.kt
+class MainActivity : AppCompatActivity() {
+lateinit var infoText: TextView
+override fun onCreate(savedInstanceState: Bundle?) {
+super.onCreate(savedInstanceState)
+setContentView(R.layout.activity_main)
+infoText = findViewById(R.id.infoText)
+val manager: ConnectivityManager =
+getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+val networkInfo: NetworkInfo? = manager.activeNetworkInfo
+if(networkInfo!=null && networkInfo.isConnected){
+if(networkInfo.type == ConnectivityManager.TYPE_MOBILE) {
+infoText.text = "Connected to Cellular"
+}
+if(networkInfo.type == ConnectivityManager.TYPE_WIFI){
+infoText.text = "Connected to WiFi"
+}
+} else {
+infoText.text = "You are Offline"
+}
+}
+}
+Output:
+6 Aim: Create an android application using linear layout and insert 10 games in the list
+view and display the selected game in the text view.
+Source Code:
+activity_main.xml
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+xmlns:app="http://schemas.android.com/apk/res-auto"
+xmlns:tools="http://schemas.android.com/tools"
+android:layout_width="match_parent"
+android:layout_height="match_parent"
+android:paddingHorizontal="10dp"
+android:paddingTop="10dp"
+android:orientation="vertical"
+tools:context=".MainActivity">
+<TextView
+android:id="@+id/selectedGame"
+android:layout_width="match_parent"
+android:layout_height="wrap_content"
+android:layout_marginBottom="5dp"
+android:textSize="20sp"
+android:textStyle="bold"
+android:gravity="center"
+android:padding="20dp"
+android:text="Selected Game"/>
+<ListView
+android:id="@+id/gamesList"
+android:layout_width="match_parent"
+android:layout_height="wrap_content"
+android:divider="@color/white"
+android:background="@color/listColor"
+android:dividerHeight="5dp"/>
+</LinearLayout>
+MainActivity.kt
+class MainActivity : AppCompatActivity() {
+lateinit var gamesList: ListView
+lateinit var selectedGame: TextView
+override fun onCreate(savedInstanceState: Bundle?) {
+super.onCreate(savedInstanceState)
+setContentView(R.layout.activity_main)
+gamesList = findViewById(R.id.gamesList)
+selectedGame = findViewById(R.id.selectedGame)
+val games: Array<String> = arrayOf("PUBG", "Fortnite", "Valorant", "BGMI",
+"GTA V1", "Red Dead Redemption", "Minecraft", "CS GO", "GTA Vice City", "Asphalt
+8")
+gamesList.adapter = ArrayAdapter(this, android.R.layout.simple_list_item_1,
+games)
+gamesList.setOnItemClickListener { adapterView, view, i, l ->
+selectedGame.text = games.get(i)
+}
+}
+}
+Output:
+7 Aim: Insert the new contents in the following resources (Color, Theme, String, Drawable,
+Dimension, Image) and demonstrate their uses in the android application
+Source Code:
+colors.xml
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+<color name="black">#FF000000</color>
+<color name="white">#FFFFFFFF</color>
+<color name="myColor1">#D62069</color>
+<color name="myColor2">#61C821</color>
+<color name="myColor3">#FFEA2B</color>
+</resources>
+strings.xml
+<resources>
+<string name="app_name">Practical7</string>
+<string name="myFirstName">Hrithik</string>
+<string name="myLastName">Vishwakarma</string>
+</resources>
+themes.xml
+<resources xmlns:tools="http://schemas.android.com/tools">
+<style name="Base.Theme.Practical7"
+parent="Theme.Material3.DayNight.NoActionBar">
+<item name="colorPrimary">@color/myColor1</item>
+<item name="android:statusBarColor">@color/myColor1</item>
+</style>
+<style name="Theme.Practical7" parent="Base.Theme.Practical7" />
+</resources>
+drawable resource directory
+activity_main.xml
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+xmlns:tools="http://schemas.android.com/tools"
+android:id="@+id/main"
+android:layout_width="match_parent"
+android:layout_height="match_parent"
+android:orientation="vertical"
+android:padding="20dp"
+android:background="@color/myColor3"
+tools:context=".MainActivity">
+<TextView
+android:layout_width="wrap_content"
+android:layout_height="wrap_content"
+android:textSize="30sp"
+android:textStyle="bold"
+android:text="@string/myFirstName"/>
+<TextView
+android:layout_width="wrap_content"
+android:layout_height="wrap_content"
+android:textSize="20sp"
+android:textStyle="bold"
+android:layout_marginBottom="20dp"
+android:text="@string/myLastName"/>
+<Button
+android:layout_width="match_parent"
+android:layout_height="wrap_content"
+android:text="Default Color Button"
+android:textSize="20sp"
+android:textStyle="bold"
+android:layout_marginBottom="20dp"
+android:padding="15dp"/>
+<Button
+android:layout_width="match_parent"
+android:layout_height="wrap_content"
+android:text="Custom Color Button"
+android:textSize="20sp"
+android:textStyle="bold"
+android:layout_marginBottom="20dp"
+android:backgroundTint="@color/myColor2"
+android:padding="15dp"/>
+<ImageView
+android:layout_width="match_parent"
+android:layout_height="wrap_content"
+android:src="@drawable/dummy_image"/>
+</LinearLayout>
+Output:
+Before changing themes.xml: After:
+8 Aim: Create an android application to demonstrate the use of menu or sub menu the toast
+should be appeared by selecting the sub menu item.
+Source Code:
+actionbar_menu.xml
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+xmlns:app="http://schemas.android.com/apk/res-auto">
+<item app:showAsAction="always"
+android:id="@+id/about"
+android:icon="@drawable/right_arrow"
+android:title="About">
+<menu>
+<item
+app:showAsAction="always"
+android:id="@+id/setting"
+android:icon="@drawable/right_arrow"
+android:title="Settings">
+<menu>
+<item
+android:id="@+id/feedback"
+android:title="Feedback"
+app:showAsAction="never"/>
+<item android:id="@+id/share"
+android:title="Share"
+app:showAsAction="never"/>
+<item android:id="@+id/home"
+android:title="Home"
+app:showAsAction="never"/>
+</menu>
+</item>
+</menu>
+</item>
+</menu>
+MainActivity.kt
+class MainActivity : AppCompatActivity() {
+override fun onCreate(savedInstanceState: Bundle?) {
+super.onCreate(savedInstanceState)
+setContentView(R.layout.activity_main)
+}
+override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+menuInflater.inflate(R.menu.actionbar_menu,menu)
+return true
+}
+override fun onOptionsItemSelected(item: MenuItem): Boolean {
+val id = item.itemId
+if(id == R.id.feedback){
+Toast.makeText(this,"Feedback",Toast.LENGTH_LONG).show()
+}
+if(id == R.id.share){
+Toast.makeText(this,"Share",Toast.LENGTH_LONG).show()
+}
+if(id == R.id.home){
+Toast.makeText(this,"Home",Toast.LENGTH_LONG).show()
+}
+return super.onOptionsItemSelected(item)
+}
+}
+Output:
+9 Aim: Create an android app to demonstrate activity life cycle.
+Source Code:
+MainActivity.kt
+class MainActivity : AppCompatActivity() {
+override fun onCreate(savedInstanceState: Bundle?) {
+super.onCreate(savedInstanceState)
+setContentView(R.layout.activity_main)
+Log.d("Life cycle", "onCreate()")
+}
+public override fun onStart() {
+super.onStart()
+Log.d("Life cycle", "onStart()")
+}
+public override fun onResume() {
+super.onResume()
+Log.d("Life cycle", "onResume()")
+}
+public override fun onRestart() {
+super.onRestart()
+Log.d("Life cycle", "onRestart()")
+}
+public override fun onPause() {
+super.onPause()
+Log.d("Life cycle", "onPause()")
+}
+public override fun onStop() {
+super.onStop()
+Log.d("Life cycle", "onStop()")
+}
+public override fun onDestroy() { super.onDestroy()
+Log.d("Life cycle", "onDestroy()")
+}
+}
+Output:
+10 Aim: Create an android application to demonstrate use of Fragments.
+Source Code:
+activity_main.xml
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+xmlns:android="http://schemas.android.com/apk/res/android"
+xmlns:tools="http://schemas.android.com/tools"
+android:layout_width="match_parent"
+android:layout_height="match_parent"
+android:orientation="vertical"
+tools:context=".MainActivity">
+<LinearLayout
+android:layout_width="match_parent"
+android:layout_height="wrap_content"
+android:background="@color/black"
+android:orientation="horizontal"
+android:gravity="center_horizontal"
+android:padding="10dp">
+<Button
+android:id="@+id/btn1"
+android:layout_height="wrap_content"
+android:layout_width="wrap_content"
+android:layout_marginEnd="10dp"
+android:text="Fragment 1"/>
+<Button
+android:id="@+id/btn2"
+android:layout_height="wrap_content"
+android:layout_width="wrap_content"
+android:text="Fragment 2"/>
+</LinearLayout>
+<FrameLayout
+android:id="@+id/frameLayout"
+android:layout_width="match_parent"
+android:layout_height="match_parent"/>
+</LinearLayout>
+fragment_first.xml
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+xmlns:tools="http://schemas.android.com/tools"
+android:layout_width="match_parent"
+android:layout_height="match_parent"
+android:orientation="vertical"
+android:background="@color/firstFragmentBg"
+tools:context=".FirstFragment">
+<TextView
+android:layout_width="match_parent"
+android:layout_height="match_parent"
+android:gravity="center"
+android:textSize="30sp"
+android:textColor="@color/white"
+android:textStyle="bold"
+android:text="First Fragment" />
+</LinearLayout>
+fragment_second.xml
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+xmlns:tools="http://schemas.android.com/tools"
+android:layout_width="match_parent"
+android:layout_height="match_parent"
+android:orientation="vertical"
+android:background="@color/secondFragmentBg"
+tools:context=".SecondFragment">
+<TextView
+android:layout_width="match_parent"
+android:layout_height="match_parent"
+android:gravity="center"
+android:textSize="30sp"
+android:textColor="@color/white"
+android:textStyle="bold"
+android:text="Second Fragment" />
+</LinearLayout>
+MainActivity.kt
+class MainActivity : AppCompatActivity() {
+lateinit var frameLayout: FrameLayout
+lateinit var btn1: Button
+lateinit var btn2: Button
+override fun onCreate(savedInstanceState: Bundle?) {
+super.onCreate(savedInstanceState)
+setContentView(R.layout.activity_main)
+frameLayout = findViewById(R.id.frameLayout)
+btn1 = findViewById(R.id.btn1)
+btn2 = findViewById(R.id.btn2)
+btn1.setOnClickListener {
+Toast.makeText(this, "Btn1 Clicked", Toast.LENGTH_SHORT).show()
+loadFrag(FirstFragment())
+}
+btn2.setOnClickListener {
+Toast.makeText(this, "Btn2 Clicked", Toast.LENGTH_SHORT).show()
+loadFrag(SecondFragment())
+}
+}
+fun loadFrag(fragment: Fragment){
+val ft = supportFragmentManager.beginTransaction()
+ft.replace(R.id.frameLayout, fragment)
+ft.commit()
+}
+}
+Output:
+11 Aim: Create an android application to demonstrate Permissions in the android app.
+Source Code:
+AndroidManifest.xml
+<uses-feature
+android:name="android.hardware.camera"
+android:required="false" />
+<uses-permission android:name="android.permission.INTERNET" />
+<uses-permission android:name="android.permission.CAMERA"/>
+<uses-permission android:name="android.permission.READ_CONTACTS"/>
+<uses-permission android:name="android.permission.READ_CALENDAR"/>
+activity_main.xml
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+xmlns:app="http://schemas.android.com/apk/res-auto"
+xmlns:tools="http://schemas.android.com/tools"
+android:id="@+id/main"
+android:layout_width="match_parent"
+android:layout_height="match_parent"
+android:orientation="vertical"
+android:padding="30dp"
+android:gravity="center"
+tools:context=".MainActivity">
+<Button
+android:id="@+id/cameraButton"
+android:layout_width="match_parent"
+android:layout_height="wrap_content"
+android:text="Give Camera Permission" />
+<Button
+android:id="@+id/contactsButton"
+android:layout_width="match_parent"
+android:layout_height="wrap_content"
+android:text="Give Contacts Permission" />
+<Button
+android:id="@+id/calendarButton"
+android:layout_width="match_parent"
+android:layout_height="wrap_content"
+android:text="Give Calendar Permission" />
+</LinearLayout>
+MainActivity.kt
+class MainActivity : AppCompatActivity() {
+lateinit var cameraBtn: Button
+lateinit var calendarBtn: Button
+lateinit var contactsBtn: Button
+private val MY_CAMERA_REQUEST_CODE = 100;
+private val MY_CALENDAR_REQUEST_CODE = 101;
+private val MY_CONTACTS_REQUEST_CODE = 102;
+override fun onCreate(savedInstanceState: Bundle?) {
+super.onCreate(savedInstanceState)
+setContentView(R.layout.activity_main)
+cameraBtn = findViewById(R.id.cameraButton)
+calendarBtn = findViewById(R.id.calendarButton)
+contactsBtn = findViewById(R.id.contactsButton)
+cameraBtn.setOnClickListener {
+checkAndRequestPermission("Camera", Manifest.permission.CAMERA,
+MY_CAMERA_REQUEST_CODE)
+}
+calendarBtn.setOnClickListener {
+checkAndRequestPermission("Calendar",
+Manifest.permission.READ_CALENDAR,MY_CALENDAR_REQUEST_CODE)
+}
+contactsBtn.setOnClickListener {
+checkAndRequestPermission("Contacts",
+Manifest.permission.READ_CONTACTS, MY_CONTACTS_REQUEST_CODE)
+}
+}
+private fun checkAndRequestPermission(whichButton: String, whichPermission:
+String, requestCode: Int) {
+if (checkSelfPermission(whichPermission) !=
+PackageManager.PERMISSION_GRANTED) {
+Toast.makeText(this, "$whichButton Button Clicked",
+Toast.LENGTH_SHORT).show()
+requestPermissions(arrayOf(whichPermission), requestCode);
+} else {
+Toast.makeText(this, "Already has $whichButton Access",
+Toast.LENGTH_SHORT).show()
+}
+}
+}
+Output:
+12 Aim: Demonstrate the use of Alert Dialog Fragment.
+Source Code:
+activity_main.xml
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+xmlns:tools="http://schemas.android.com/tools"
+android:layout_width="match_parent"
+android:layout_height="match_parent"
+android:padding="100dp"
+android:background="#ED0527"
+tools:context=".MainActivity">
+<Button
+android:layout_width="match_parent"
+android:id="@+id/callfrag"
+android:text="Show Alert Dialog"
+android:textColor="@color/white"
+android:layout_height="wrap_content"/>
+</LinearLayout>
+fragment_alert_dialog.xml
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+android:layout_width="match_parent"
+xmlns:tools="http://schemas.android.com/tools"
+android:orientation="vertical"
+android:layout_height="match_parent">
+<LinearLayout
+android:layout_width="match_parent"
+android:layout_height="wrap_content"
+android:padding="20dp"
+android:background="#B1050B"
+android:orientation="vertical">
+<EditText
+android:layout_width="match_parent"
+android:id="@+id/nameET"
+android:hint="Enter Your Name"
+android:textSize="20dp"
+android:textStyle="bold"
+android:textColor="#F8F6F6"
+android:layout_height="wrap_content"/>
+<EditText
+android:layout_width="match_parent"
+android:id="@+id/passET"
+android:hint="Password"
+android:textSize="20dp"
+android:textStyle="bold"
+android:textColor="#F8F6F6"
+android:layout_height="wrap_content"/>
+<LinearLayout
+android:layout_width="match_parent"
+android:orientation="horizontal"
+android:padding="5dp"
+android:gravity="center_horizontal"
+android:layout_height="wrap_content">
+<Button
+android:layout_width="wrap_content"
+android:id="@+id/login"
+android:layout_margin="5dp"
+android:text="Login"
+android:textColor="#F8F6F6"
+android:layout_height="wrap_content"/>
+<Button
+android:layout_width="wrap_content"
+android:id="@+id/cancel"
+android:layout_margin="5dp"
+android:text="Cancel"
+android:textColor="#F8F6F6"
+android:layout_height="wrap_content"/>
+</LinearLayout>
+</LinearLayout>
+</LinearLayout>
+AlertDialogFragment.kt
+class AlertDialogFragment : DialogFragment() {
+override fun onCreateView(
+inflater: LayoutInflater, container: ViewGroup?,
+savedInstanceState: Bundle?
+): View? {
+val rootview: View = inflater.inflate(R.layout.fragment_alert_dialog,
+container,false)
+val cancel=rootview.findViewById<Button>(R.id.cancel)
+val login=rootview.findViewById<Button>(R.id.login)
+cancel.setOnClickListener {
+dismiss()
+}
+login.setOnClickListener { }
+return rootview
+}
+}
+ActivityMain.kt
+class MainActivity : AppCompatActivity() {
+lateinit var call: Button
+override fun onCreate(savedInstanceState: Bundle?) {
+super.onCreate(savedInstanceState)
+setContentView(R.layout.activity_main)
+call = findViewById(R.id.callfrag)
+call.setOnClickListener {
+val fm=supportFragmentManager
+val myfragment = AlertDialogFragment()
+myfragment.show(fm, "My Login page")
+}
+}
+}
+Output:
+13 Aim: Demonstrate the use of Telephone API
+Source Code:
+activity_main.xml
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+xmlns:tools="http://schemas.android.com/tools"
+android:layout_width="match_parent"
+android:layout_height="match_parent"
+android:orientation="vertical"
+android:padding="20dp"
+android:gravity="center"
+tools:context=".MainActivity">
+<EditText
+android:id="@+id/phontET"
+android:layout_width="match_parent"
+android:hint="Enter you phone"
+android:padding="20dp"
+android:textSize="40sp"
+android:textStyle="bold"
+android:textAlignment="center"
+android:layout_marginBottom="20dp"
+android:layout_height="wrap_content"/>
+<Button
+android:id="@+id/callBtn"
+android:layout_width="match_parent"
+android:text="Make call"
+android:padding="10dp"
+android:textSize="20sp"
+android:layout_height="wrap_content"/>
+</LinearLayout>
+ActivityMain.kt
+class MainActivity : AppCompatActivity() {
+lateinit var callBtn: Button
+lateinit var phoneET: EditText
+val REQUEST_CODE = 1
+override fun onCreate(savedInstanceState: Bundle?) {
+super.onCreate(savedInstanceState)
+setContentView(R.layout.activity_main)
+callBtn=findViewById(R.id.callBtn)
+phoneET=findViewById(R.id.phontET)
+callBtn.setOnClickListener {
+if
+(ActivityCompat.checkSelfPermission(this,Manifest.permission.CALL_PHONE) !=
+PackageManager.PERMISSION_GRANTED) {
+ActivityCompat.requestPermissions(this,
+arrayOf(Manifest.permission.CALL_PHONE), REQUEST_CODE)
+} else makecall()
+}
+}
+private fun makecall() {
+val intent = Intent(Intent.ACTION_CALL)
+intent.data= Uri.parse("tel:"+ phoneET.text.toString())
+startActivity(intent)
+}
+override fun onRequestPermissionsResult(requestCode: Int, permissions:
+Array<out String>, grantResults: IntArray) {
+super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+if (requestCode==REQUEST_CODE) makecall()
+}
+}
+Output:
+14 Aim: Demonstrate the use of Implicit Intent (Create an android application to pass data from
+current application to another application using intent)
+Source Code:
+activity_main.xml
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+xmlns:app="http://schemas.android.com/apk/res-auto"
+xmlns:tools="http://schemas.android.com/tools"
+android:layout_width="match_parent"
+android:layout_height="match_parent"
+android:orientation="vertical"
+android:gravity="center"
+android:padding="20dp"
+tools:context=".MainActivity">
+<EditText
+android:id="@+id/dataET"
+android:layout_width="match_parent"
+android:layout_height="wrap_content"
+android:layout_marginBottom="20dp"
+android:textSize="30sp"
+android:hint="Enter Your Data" />
+<Button
+android:id="@+id/button"
+android:layout_width="wrap_content"
+android:layout_height="wrap_content"
+android:textSize="30sp"
+android:text="Send Data"
+app:layout_constraintBottom_toBottomOf="parent"
+app:layout_constraintEnd_toEndOf="parent"
+app:layout_constraintStart_toStartOf="parent"
+app:layout_constraintTop_toTopOf="parent" />
+</LinearLayout>
+MainActivity.kt
+class MainActivity : AppCompatActivity() {
+lateinit var button: Button
+lateinit var dataEt: EditText
+override fun onCreate(savedInstanceState: Bundle?) {
+super.onCreate(savedInstanceState)
+setContentView(R.layout.activity_main)
+button = findViewById(R.id.button)
+dataEt = findViewById(R.id.dataET)
+button.setOnClickListener {
+val intent = Intent()
+intent.setAction(Intent.ACTION_SEND)
+intent.putExtra(Intent.EXTRA_TEXT, dataEt.text.toString())
+intent.setType("text/plain")
+if(intent.resolveActivity(packageManager) != null) {
+startActivity(intent)
+}
+}
+}
+}
+Output:
